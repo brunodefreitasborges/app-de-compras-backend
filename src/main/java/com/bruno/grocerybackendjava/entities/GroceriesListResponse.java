@@ -11,9 +11,8 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class GroceryResponse {
+public class GroceriesListResponse {
 
-    private String category;
-    private List<GroceryEntity> groceries;
-
+    private String listName;
+    private List<FilteredGroceries> groceryList;
 }

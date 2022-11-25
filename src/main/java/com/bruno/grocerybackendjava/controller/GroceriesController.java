@@ -1,7 +1,9 @@
 package com.bruno.grocerybackendjava.controller;
 
+import com.bruno.grocerybackendjava.entities.FilteredGroceries;
+import com.bruno.grocerybackendjava.entities.GroceriesList;
+import com.bruno.grocerybackendjava.entities.GroceriesListResponse;
 import com.bruno.grocerybackendjava.entities.GroceryEntity;
-import com.bruno.grocerybackendjava.entities.GroceryResponse;
 import com.bruno.grocerybackendjava.service.GroceriesService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -9,32 +11,51 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/groceries")
+@RequestMapping("/api/v1")
 @RequiredArgsConstructor
 @CrossOrigin(origins = "*")
 public class GroceriesController {
 
     private final GroceriesService groceriesService;
 
-    @GetMapping("")
-    public List<GroceryResponse> getAllGroceries() {
-        return groceriesService.getAllGroceries();
+    // Lists Operations
+    @PostMapping("")
+    // Creates an Empty Grocery List
+    public GroceriesList addList(@RequestBody GroceriesList list) {
+        return groceriesService.addList(list);
     }
 
-    @PostMapping("")
-    public GroceryEntity addGrocery(@RequestBody GroceryEntity grocery) {
-        return groceriesService.addGrocery(grocery);
+    @GetMapping("")
+    public List<GroceriesList> getLists(@RequestParam(value="id", required = false, defaultValue = "") String id) {
+        return groceriesService.getLists(id);
     }
 
     @PutMapping("/{id}")
-    public GroceryEntity updateGrocery(@PathVariable String id, @RequestBody GroceryEntity grocery) {
-        return groceriesService.updateGrocery(id, grocery);
+    public GroceriesList updateList(@PathVariable String id, @RequestBody GroceriesList list) {
+        return groceriesService.updateList(id, list);
     }
 
     @DeleteMapping("/{id}")
-    public void deleteGrocery(@PathVariable String id) {
-        groceriesService.deleteGrocery(id);
+    public void deleteList(@PathVariable String id) {
+        groceriesService.deleteList(id);
     }
 
+    // Groceries Operations
+    @PostMapping("list/{id}")
+    // Adds a Grocery to a Grocery List
+    public GroceriesList addGroceryToList(@PathVariable String id, @RequestBody GroceryEntity grocery) {
+        return groceriesService.addGroceryToList(id, grocery);
+    }
+
+    @PutMapping("list/{id}")
+    // Updates a Grocery from a Grocery List
+    public GroceriesListResponse updateGroceryFromList(@PathVariable String id, @RequestBody GroceryEntity grocery) {
+        return groceriesService.updateGroceryFromList(id, grocery);
+    }
+
+    @DeleteMapping("list/{id}")
+    public GroceriesList deleteGroceryFromList(@PathVariable String id, @RequestBody GroceryEntity grocery) {
+        return groceriesService.deleteGroceryFromList(id, grocery);
+    }
 
 }
