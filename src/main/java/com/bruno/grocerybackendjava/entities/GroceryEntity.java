@@ -4,8 +4,10 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.Id;
 
 import javax.validation.constraints.NotBlank;
+import java.util.UUID;
 
 @Data
 @Builder
@@ -17,8 +19,11 @@ public class GroceryEntity {
     private String category;
     @NotBlank(message = "Product Name is mandatory")
     private String product;
-    private Double price;
+    @Builder.Default
+    private Double price = 0.00;
     private Integer quantity;
     @Builder.Default
     private Boolean checked = false;
+
+
 }

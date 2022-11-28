@@ -24,13 +24,19 @@ public class GroceriesService {
         return listsRepository.save(list);
     }
 
-    public List<GroceriesList> getLists(String id) {
-        if (id.isEmpty()) {
-            return listsRepository.findAll();
-        } else {
-            return List.of(listsRepository.findById(id).orElseThrow(() -> new RuntimeException("List not found")));
+    // Returns all Grocery Lists, filtered
+    public List<GroceriesListResponse> getAllLists(String id) {
+        List<GroceriesListResponse> groceriesListResponses = new ArrayList<>();
+        List<GroceriesList> lists = listsRepository.findAll();
+
+        lists.forEach(list -> {
+            GroceriesListResponse groceriesListResponse = filterGroceryList(list);
+            groceriesListResponses.add(groceriesListResponse);
+        });
+
+           return groceriesListResponses;
         }
-    }
+
 
     public GroceriesList updateList(String id, GroceriesList list) {
         GroceriesList listToUpdate = listsRepository.findById(id).orElseThrow(() -> new RuntimeException("List not found"));
@@ -49,7 +55,7 @@ public class GroceriesService {
     }
 
     // Adds a new Grocery to a Grocery List, if the Grocery already exists, it will throw an error
-    public GroceriesList addGroceryToList(String id, GroceryEntity grocery) {
+    public GroceriesListResponse addGroceryToList(String id, GroceryEntity grocery) {
         GroceriesList list = listsRepository.findById(id).orElseThrow(() -> new RuntimeException("List not found"));
         list.getGroceryList().stream().filter(groceryEntity -> {
             if (groceryEntity.getProduct().equals(grocery.getProduct())) {
@@ -60,7 +66,7 @@ public class GroceriesService {
             list.getGroceryList().add(grocery);
             return grocery;
         });
-        return listsRepository.save(list);
+        return filterGroceryList(listsRepository.save(list));
     }
 
     // Deletes a Grocery from a Grocery List, if the Grocery doesn't exist, it will throw an error
@@ -80,17 +86,26 @@ public class GroceriesService {
                 Objects.equals(groceryEntity.getProduct(), grocery.getProduct())
         ).findFirst().orElseThrow(() -> new RuntimeException("Product not found"));
 
-        productToUpdate.setQuantity(grocery.getQuantity());
-        productToUpdate.setPrice(grocery.getPrice());
+        if(grocery.getQuantity() != null) {
+            productToUpdate.setQuantity(grocery.getQuantity());
+        }
+        if(grocery.getPrice() != null) {
+            productToUpdate.setPrice(grocery.getPrice());
+        }
+        if(grocery.getChecked() != null) {
+            productToUpdate.setChecked(grocery.getChecked());
+        }
+
+        productToUpdate.setCategory(grocery.getCategory());
         productToUpdate.setProduct(grocery.getProduct());
 
-        return filterGroceryList(listsRepository.save(list).getGroceryList());
+        return filterGroceryList(listsRepository.save(list));
 
     }
 
     // Method to Filter Groceries into Categories
-    public GroceriesListResponse filterGroceryList(List<GroceryEntity> groceries) {
-        List<String> categories = groceries.stream().map(GroceryEntity::getCategory).distinct().toList();
+    public GroceriesListResponse filterGroceryList(GroceriesList groceries) {
+        List<String> categories = groceries.getGroceryList().stream().map(GroceryEntity::getCategory).distinct().toList();
 
         GroceriesListResponse groceriesListResponse = GroceriesListResponse.builder().groceryList(List.of(FilteredGroceries.builder().build())).build();
 
@@ -98,13 +113,15 @@ public class GroceriesService {
 
         categories.forEach(category -> {
             FilteredGroceries filteredGroceries = FilteredGroceries.builder().category(category).groceries(List.of()).build();
-            List<GroceryEntity> groceryEntities = groceries.stream().filter(groceryEntity ->
+            List<GroceryEntity> groceryEntities = groceries.getGroceryList().stream().filter(groceryEntity ->
                     Objects.equals(groceryEntity.getCategory(), category)).toList();
         filteredGroceries.setGroceries(groceryEntities);
         allFilteredGroceries.add(filteredGroceries);
         });
 
         groceriesListResponse.setGroceryList(allFilteredGroceries);
+        groceriesListResponse.setId(groceries.getId());
+        groceriesListResponse.setListName(groceries.getListName());
 
         return groceriesListResponse;
     }

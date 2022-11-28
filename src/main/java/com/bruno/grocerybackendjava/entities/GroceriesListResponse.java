@@ -13,6 +13,7 @@ import java.util.List;
 @NoArgsConstructor
 public class GroceriesListResponse {
 
+    private String id;
     private String listName;
     private List<FilteredGroceries> groceryList;
 }

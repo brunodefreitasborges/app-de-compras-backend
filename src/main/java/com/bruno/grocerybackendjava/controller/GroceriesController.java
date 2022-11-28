@@ -13,7 +13,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "*")
+
 public class GroceriesController {
 
     private final GroceriesService groceriesService;
@@ -26,8 +26,8 @@ public class GroceriesController {
     }
 
     @GetMapping("")
-    public List<GroceriesList> getLists(@RequestParam(value="id", required = false, defaultValue = "") String id) {
-        return groceriesService.getLists(id);
+    public List<GroceriesListResponse> getLists(@RequestParam(value="id", required = false, defaultValue = "") String id) {
+        return groceriesService.getAllLists(id);
     }
 
     @PutMapping("/{id}")
@@ -43,7 +43,7 @@ public class GroceriesController {
     // Groceries Operations
     @PostMapping("list/{id}")
     // Adds a Grocery to a Grocery List
-    public GroceriesList addGroceryToList(@PathVariable String id, @RequestBody GroceryEntity grocery) {
+    public GroceriesListResponse addGroceryToList(@PathVariable String id, @RequestBody GroceryEntity grocery) {
         return groceriesService.addGroceryToList(id, grocery);
     }
 
