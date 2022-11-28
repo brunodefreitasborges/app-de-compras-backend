@@ -35,9 +35,9 @@ public class GroceriesController {
         return groceriesService.updateList(id, list);
     }
 
-    @DeleteMapping("/{id}")
-    public void deleteList(@PathVariable String id) {
-        groceriesService.deleteList(id);
+    @DeleteMapping("/{list}")
+    public void deleteList(@PathVariable String list) {
+        groceriesService.deleteList(list);
     }
 
     // Groceries Operations

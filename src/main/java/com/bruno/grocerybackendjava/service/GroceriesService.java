@@ -7,12 +7,10 @@ import com.bruno.grocerybackendjava.entities.GroceryEntity;
 import com.bruno.grocerybackendjava.repository.ListsRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -34,8 +32,8 @@ public class GroceriesService {
             groceriesListResponses.add(groceriesListResponse);
         });
 
-           return groceriesListResponses;
-        }
+        return groceriesListResponses;
+    }
 
 
     public GroceriesList updateList(String id, GroceriesList list) {
@@ -50,8 +48,12 @@ public class GroceriesService {
         return listsRepository.save(list);
     }
 
-    public void deleteList(String id) {
-        listsRepository.deleteById(id);
+    public void deleteList(String list) {
+        listsRepository.findAll().forEach(lists -> {
+            if (lists.getListName().equals(list)) {
+                listsRepository.delete(lists);
+            }
+        });
     }
 
     // Adds a new Grocery to a Grocery List, if the Grocery already exists, it will throw an error
@@ -86,13 +88,13 @@ public class GroceriesService {
                 Objects.equals(groceryEntity.getProduct(), grocery.getProduct())
         ).findFirst().orElseThrow(() -> new RuntimeException("Product not found"));
 
-        if(grocery.getQuantity() != null) {
+        if (grocery.getQuantity() != null) {
             productToUpdate.setQuantity(grocery.getQuantity());
         }
-        if(grocery.getPrice() != null) {
+        if (grocery.getPrice() != null) {
             productToUpdate.setPrice(grocery.getPrice());
         }
-        if(grocery.getChecked() != null) {
+        if (grocery.getChecked() != null) {
             productToUpdate.setChecked(grocery.getChecked());
         }
 
@@ -115,8 +117,8 @@ public class GroceriesService {
             FilteredGroceries filteredGroceries = FilteredGroceries.builder().category(category).groceries(List.of()).build();
             List<GroceryEntity> groceryEntities = groceries.getGroceryList().stream().filter(groceryEntity ->
                     Objects.equals(groceryEntity.getCategory(), category)).toList();
-        filteredGroceries.setGroceries(groceryEntities);
-        allFilteredGroceries.add(filteredGroceries);
+            filteredGroceries.setGroceries(groceryEntities);
+            allFilteredGroceries.add(filteredGroceries);
         });
 
         groceriesListResponse.setGroceryList(allFilteredGroceries);
