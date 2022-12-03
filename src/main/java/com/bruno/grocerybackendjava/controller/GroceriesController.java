@@ -54,7 +54,7 @@ public class GroceriesController {
     }
 
     @DeleteMapping("list/{id}")
-    public GroceriesList deleteGroceryFromList(@PathVariable String id, @RequestBody GroceryEntity grocery) {
+    public GroceriesListResponse deleteGroceryFromList(@PathVariable String id, @RequestBody GroceryEntity grocery) {
         return groceriesService.deleteGroceryFromList(id, grocery);
     }
 

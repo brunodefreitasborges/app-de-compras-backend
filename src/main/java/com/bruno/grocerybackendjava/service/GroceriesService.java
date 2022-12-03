@@ -72,14 +72,14 @@ public class GroceriesService {
     }
 
     // Deletes a Grocery from a Grocery List, if the Grocery doesn't exist, it will throw an error
-    public GroceriesList deleteGroceryFromList(String id, GroceryEntity grocery) {
+    public GroceriesListResponse deleteGroceryFromList(String id, GroceryEntity grocery) {
         GroceriesList list = listsRepository.findById(id).orElseThrow(() -> new RuntimeException("List not found"));
         GroceryEntity productToDelete = list.getGroceryList().stream().filter(groceryEntity ->
                 Objects.equals(groceryEntity.getProduct(), grocery.getProduct())
         ).findFirst().orElseThrow(() -> new RuntimeException("Product not found"));
 
         list.getGroceryList().remove(productToDelete);
-        return listsRepository.save(list);
+        return filterGroceryList(listsRepository.save(list));
     }
 
     public GroceriesListResponse updateGroceryFromList(String id, GroceryEntity grocery) {
